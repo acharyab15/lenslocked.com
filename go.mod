@@ -1,4 +1,4 @@
-module github.com/acharyab15/lenslocked.com
+module lenslocked.com
 
 go 1.12
 
