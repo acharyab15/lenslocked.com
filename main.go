@@ -10,6 +10,7 @@ import (
 
 var homeView *views.View
 var contactView *views.View
+var faqView *views.View
 
 func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -26,7 +27,9 @@ func contact(w http.ResponseWriter, r *http.Request) {
 
 func faq(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprint(w, "These are the <h1>FAQs</h1>")
+	if err := faqView.Template.ExecuteTemplate(w, faqView.Layout, nil); err != nil {
+		panic(err)
+	}
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +40,7 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 func main() {
 	homeView = views.NewView("bootstrap", "views/home.gohtml")
 	contactView = views.NewView("bootstrap", "views/contact.gohtml")
+	faqView = views.NewView("bootstrap", "views/faq.gohtml")
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", home)
