@@ -1,4 +1,4 @@
-{{define "bootstrap"}}
+{{define "faq"}}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -10,7 +10,9 @@
 <body>
     {{template "navbar"}}
 <div class="container-fluid">
-    {{template "yield" .}} 
+    <font color="green">
+        {{template "yield" .}}
+    </font>
 
     {{template "footer"}}
 </div>
