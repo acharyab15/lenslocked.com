@@ -44,6 +44,7 @@ func main() {
 		Name:  "Michael Scott",
 		Email: "michael@dundermifflin.com",
 	}
+	user.Name = "Updated Name"
 	us, err := models.NewUserService(psqlInfo)
 	if err != nil {
 		panic(err)
@@ -54,11 +55,19 @@ func main() {
 		panic(err)
 	}
 
-	foundUser, err := us.ByEmail("michael@dundermifflin.com")
-	if err != nil {
+	user.Name = "Updated Name"
+	if err := us.Update(&user); err != nil {
 		panic(err)
 	}
-	fmt.Println(foundUser)
+	foundUser, err := us.ByEmail("michael@dundermifflin.com")
+	if err := us.Delete(foundUser.ID); err != nil {
+		panic(err)
+	}
+	// Verify the user is deleted
+	_, err = us.ByID(foundUser.ID)
+	if err != models.ErrNotFound {
+		panic("user was not deleted!")
+	}
 }
 
 func createOrder(db *gorm.DB, user User, amount int, desc string) {

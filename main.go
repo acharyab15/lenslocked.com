@@ -6,6 +6,14 @@ import (
 
 	"github.com/gorilla/mux"
 	"lenslocked.com/controllers"
+	"lenslocked.com/models"
+)
+
+const (
+	host   = "localhost"
+	port   = 5432
+	user   = "postgres"
+	dbname = "lenslocked_dev"
 )
 
 func notFound(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +28,18 @@ func must(err error) {
 }
 
 func main() {
-	usersC := controllers.NewUsers()
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"dbname=%s sslmode=disable",
+		host, port, user, dbname)
+
+	us, err := models.NewUserService(psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer us.Close()
+	us.AutoMigrate()
+
+	usersC := controllers.NewUsers(us)
 	staticC := controllers.NewStatic()
 
 	r := mux.NewRouter()
