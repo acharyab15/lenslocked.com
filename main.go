@@ -48,6 +48,8 @@ func main() {
 	r.Handle("/faq", staticC.Faq).Methods("GET")
 	r.Handle("/signup", usersC.NewView).Methods("GET")
 	r.HandleFunc("/signup", usersC.Create).Methods("POST")
+	r.Handle("/login", usersC.LoginView).Methods("GET")
+	r.HandleFunc("/login", usersC.Login).Methods("POST")
 
 	var h http.Handler = http.HandlerFunc(notFound)
 	r.NotFoundHandler = h
