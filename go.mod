@@ -12,11 +12,10 @@ require (
 	github.com/jinzhu/now v1.1.1 // indirect
 	github.com/lib/pq v1.3.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
-	github.com/yuin/goldmark v1.1.26 // indirect
-	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59 // indirect
+	golang.org/x/crypto v0.0.0-20200406173513-056763e48d71
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
-	golang.org/x/sys v0.0.0-20200327173247-9dae0f8f5775 // indirect
-	golang.org/x/tools v0.0.0-20200329025819-fd4102a86c65 // indirect
+	golang.org/x/sys v0.0.0-20200409092240-59c9f1ba88fa // indirect
+	golang.org/x/tools v0.0.0-20200410040751-3bd20875a2eb // indirect
 	google.golang.org/appengine v1.6.5 // indirect
 )
