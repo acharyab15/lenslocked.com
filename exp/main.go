@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 
+	"lenslocked.com/rand"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
-	"lenslocked.com/models"
 )
 
 const (
@@ -30,27 +31,27 @@ type Order struct {
 }
 
 func main() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"dbname=%s sslmode=disable",
-		host, port, user, dbname)
-	db, err := gorm.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	db.LogMode(true)
+	// psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+	// 	"dbname=%s sslmode=disable",
+	// 	host, port, user, dbname)
+	// db, err := gorm.Open("postgres", psqlInfo)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer db.Close()
+	// db.LogMode(true)
 
-	user := models.User{
-		Name:  "Michael Scott",
-		Email: "michael@dundermifflin.com",
-	}
-	user.Name = "Updated Name"
-	us, err := models.NewUserService(psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer us.Close()
-	us.DestructiveReset()
+	// user := models.User{
+	// 	Name:  "Michael Scott",
+	// 	Email: "michael@dundermifflin.com",
+	// }
+	// user.Name = "Updated Name"
+	// us, err := models.NewUserService(psqlInfo)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer us.Close()
+	// us.DestructiveReset()
 	// if err := us.Create(&user); err != nil {
 	// 	panic(err)
 	// }
@@ -68,6 +69,8 @@ func main() {
 	// if err != models.ErrNotFound {
 	// 	panic("user was not deleted!")
 	// }
+	fmt.Println(rand.String(10))
+	fmt.Println(rand.RememberToken())
 }
 
 func createOrder(db *gorm.DB, user User, amount int, desc string) {
