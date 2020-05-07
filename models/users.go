@@ -25,6 +25,9 @@ var (
 		"models: incorrect password provided")
 )
 
+var _ UserDB = &userGorm{}
+var _ UserService = &userService{}
+
 // UserDB is used to interact with the users database.
 //
 // For pretty much all single user queries:
@@ -56,6 +59,19 @@ type UserDB interface {
 	DestructiveReset() error
 }
 
+// UserService is a set of methods used to manipulate
+// and work the user model
+type UserService interface {
+	// Authenticate will verify the provided email address
+	// and password are correct. If they are correct, the user
+	// corresponding to that email will be returned. Otherwise
+	// You will receive either:
+	// ErrNotFound, ErrInvalidPassword, or another error if
+	// something goes wrong.
+	Authenticate(email, password string) (*User, error)
+	UserDB
+}
+
 // userGorm represents our database interaction layer
 // and implements the UserDB interface fully.
 type userGorm struct {
@@ -73,7 +89,7 @@ type User struct {
 	RememberHash string `gorm:"not null;unique_index"`
 }
 
-type UserService struct {
+type userService struct {
 	UserDB
 }
 
@@ -84,13 +100,13 @@ type userValidator struct {
 	UserDB
 }
 
-func NewUserService(connectionInfo string) (*UserService, error) {
+func NewUserService(connectionInfo string) (UserService, error) {
 	ug, err := newUserGorm(connectionInfo)
 	if err != nil {
 		return nil, err
 	}
-	return &UserService{
-		UserDB: userValidation{
+	return &userService{
+		UserDB: userValidator{
 			UserDB: ug,
 		},
 	}, nil
@@ -109,8 +125,8 @@ func newUserGorm(connectionInfo string) (*userGorm, error) {
 	}, nil
 }
 
-func (us *UserService) Close() error {
-	return us.db.Close()
+func (ug *userGorm) Close() error {
+	return ug.db.Close()
 }
 
 // Authenticate can be used to authenticate a user with the
@@ -123,7 +139,7 @@ func (us *UserService) Close() error {
 //   user, nil
 // Otherwise if another error is encountered this will return
 //   nil, error
-func (us *UserService) Authenticate(email, password string) (*User, error) {
+func (us *userService) Authenticate(email, password string) (*User, error) {
 	foundUser, err := us.ByEmail(email)
 	if err != nil {
 		return nil, err
@@ -179,7 +195,7 @@ func (ug *userGorm) ByEmail(email string) (*User, error) {
 // the token for us.
 func (ug *userGorm) ByRemember(token string) (*User, error) {
 	var user User
-	rememberHash := us.hmac.Hash(token)
+	rememberHash := ug.hmac.Hash(token)
 	err := first(ug.db.Where("remember_hash = ?", rememberHash), &user)
 	if err != nil {
 		return nil, err
@@ -193,7 +209,7 @@ func (ug *userGorm) DestructiveReset() error {
 	if err != nil {
 		return err
 	}
-	return us.AutoMigrate()
+	return ug.AutoMigrate()
 }
 
 // Create will create the provided user and backfill data
