@@ -86,6 +86,8 @@ func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
 	cookie := http.Cookie{
 		Name:  "remember_token",
 		Value: user.Remember,
+		// this will tell our cookie that it is not accessible to scripts
+		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)
 	return nil
@@ -126,7 +128,7 @@ func (u *Users) CookieTest(w http.ResponseWriter, r *http.Request) {
 	}
 	user, err := u.us.ByRemember(cookie.Value)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Redirect(w, r, "/login", http.StatusNotFound)
 		return
 	}
 	fmt.Fprintln(w, user)
