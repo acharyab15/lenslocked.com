@@ -35,7 +35,23 @@ type LoginForm struct {
 }
 
 func (u *Users) New(w http.ResponseWriter, r *http.Request) {
-	if err := u.NewView.Render(w, nil); err != nil {
+	type Alert struct {
+		Level   string
+		Message string
+	}
+	type Data struct {
+		Alert *Alert
+		Yield interface{}
+	}
+	alert := Alert{
+		Level:   "success",
+		Message: "Successfully rendered a dynamic alert!",
+	}
+	data := Data{
+		Alert: &alert,
+		Yield: "this can be any data b/c its type is interface",
+	}
+	if err := u.NewView.Render(w, data); err != nil {
 		panic(err)
 	}
 }

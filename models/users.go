@@ -272,6 +272,7 @@ func (uv *userValidator) rememberMinBytes(user *User) error {
 	if n < 32 {
 		return ErrRememberTooShort
 	}
+	return nil
 }
 
 func (uv *userValidator) rememeberHashRequired(user *User) error {
