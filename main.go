@@ -32,14 +32,15 @@ func main() {
 		"dbname=%s sslmode=disable",
 		host, port, user, dbname)
 
-	us, err := models.NewUserService(psqlInfo)
+	services, err := models.NewServices(psqlInfo)
 	if err != nil {
 		panic(err)
 	}
-	defer us.Close()
-	us.AutoMigrate()
+	defer services.Close()
+	services.AutoMigrate()
 
-	usersC := controllers.NewUsers(us)
+	usersC := controllers.NewUsers(services.User)
+	galleriesC := controllers.NewGalleries(services.Gallery)
 	staticC := controllers.NewStatic()
 
 	r := mux.NewRouter()
@@ -51,6 +52,10 @@ func main() {
 	r.Handle("/login", usersC.LoginView).Methods("GET")
 	r.HandleFunc("/login", usersC.Login).Methods("POST")
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
+
+	// Gallery routes
+	r.Handle("/galleries/new", galleriesC.New).Methods("GET")
+	r.HandleFunc("/galleries", galleriesC.Create).Methods("POST")
 
 	var h http.Handler = http.HandlerFunc(notFound)
 	r.NotFoundHandler = h
