@@ -27,6 +27,7 @@ type galleryValidator struct {
 }
 
 type GalleryDB interface {
+	ByID(id uint) (*Gallery, error)
 	Create(gallery *Gallery) error
 }
 
@@ -44,6 +45,18 @@ func NewGalleryService(db *gorm.DB) GalleryService {
 			},
 		},
 	}
+}
+
+// ByID accepts an unsigned integer and returns either
+// the gallery requested or an error.
+func (gg *galleryGorm) ByID(id uint) (*Gallery, error) {
+	var gallery Gallery
+	db := gg.db.Where("id = ?", id)
+	err := first(db, &gallery)
+	if err != nil {
+		return nil, err
+	}
+	return &gallery, nil
 }
 
 func (gg *galleryGorm) Create(gallery *Gallery) error {
