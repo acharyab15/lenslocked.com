@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 
+	"lenslocked.com/context"
 	"lenslocked.com/models"
 )
 
@@ -34,10 +34,16 @@ func (mw *RequireUser) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
-		fmt.Println("User Found: ", user)
+		// Get the context from our request
+		ctx := r.Context()
+		// Create a new context from the existing one that has
+		// our user stored in it with the private user key
+		ctx = context.WithUser(ctx, user)
+
+		// Create a new request request from the existing one with our
+		// context attached to it and assign it back to `r`.
+		r = r.WithContext(ctx)
+
 		next(w, r)
-		// TODO: Check if a user is logged in.
-		// If so, call next(w, r)
-		// If not, http.Redirect to "/login"
 	})
 }
