@@ -28,6 +28,7 @@ type galleryValidator struct {
 
 type GalleryDB interface {
 	ByID(id uint) (*Gallery, error)
+	ByUserID(userID uint) ([]Gallery, error)
 	Create(gallery *Gallery) error
 	Update(gallery *Gallery) error
 	Delete(id uint) error
@@ -59,6 +60,19 @@ func (gg *galleryGorm) ByID(id uint) (*Gallery, error) {
 		return nil, err
 	}
 	return &gallery, nil
+}
+
+// ByUserID accepts an unsigned integer as the userID
+// and returns all galleries owned by that user
+func (gg *galleryGorm) ByUserID(userID uint) ([]Gallery, error) {
+	var galleries []Gallery
+	db := gg.db.Where("user_id = ?", userID)
+	// Pass a Find instead of First
+	// and pass a slice instead of a single gallery
+	if err := db.Find(&galleries).Error; err != nil {
+		return nil, err
+	}
+	return galleries, nil
 }
 
 func (gg *galleryGorm) Create(gallery *Gallery) error {
