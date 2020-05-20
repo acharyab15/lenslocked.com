@@ -45,9 +45,10 @@ func main() {
 	galleriesC := controllers.NewGalleries(services.Gallery, r)
 	staticC := controllers.NewStatic()
 
-	requireUserMw := middleware.RequireUser{
+	userMw := middleware.User{
 		UserService: services.User,
 	}
+	requireUserMw := middleware.RequireUser{}
 
 	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/contact", staticC.Contact).Methods("GET")
@@ -69,5 +70,6 @@ func main() {
 
 	var h http.Handler = http.HandlerFunc(notFound)
 	r.NotFoundHandler = h
-	http.ListenAndServe(":3000", r)
+	// Applying userMw to all routes
+	http.ListenAndServe(":3000", userMw.Apply(r))
 }
