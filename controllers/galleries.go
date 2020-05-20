@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -100,6 +101,76 @@ func (g *Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	vd.Yield = gallery
 	g.EditView.Render(w, vd)
+}
+
+// POST /galleries/:id/update
+func (g *Galleries) Update(w http.ResponseWriter, r *http.Request) {
+	// TODO: impelement this
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
+		return
+	}
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "Gallery not found", http.StatusNotFound)
+		return
+	}
+	var vd views.Data
+	vd.Yield = gallery
+	var form GalleryForm
+	if err := parseForm(r, &form); err != nil {
+		// If there is an error we are going to render the
+		// EditView again with an alert message.
+		vd.SetAlert(err)
+		g.EditView.Render(w, vd)
+		return
+	}
+	gallery.Title = form.Title
+	err = g.gs.Update(gallery)
+	// If there is an error, our alert will be an error.
+	// Otherwise, we will still render an alert,
+	// but instead it will be a success message.
+	if err != nil {
+		vd.SetAlert(err)
+	} else {
+		vd.Alert = &views.Alert{
+			Level:   views.AlertLvlSuccess,
+			Message: "Gallery updated successfully!",
+		}
+	}
+	// Error or not, we are going to render the EditView with
+	// out updated information.
+	g.EditView.Render(w, vd)
+}
+
+// POST /galleries/:id/delete
+func (g *Galleries) Delete(w http.ResponseWriter, r *http.Request) {
+	// Lookup the gallery using the galleryByID we wrote earlier
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
+		// If there is an error the galleryByID will have rendered it for us already.
+		return
+	}
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "You do not have permission to edit "+
+			"this gallery", http.StatusForbidden)
+		return
+	}
+	var vd views.Data
+	err = g.gs.Delete(gallery.ID)
+	if err != nil {
+		// If there is an error we want to set an alert and render
+		// the edit page with the error. We also need to
+		// set the Yield to gallery so that the EditView
+		// is rendered correctly.
+		vd.SetAlert(err)
+		vd.Yield = gallery
+		g.EditView.Render(w, vd)
+		return
+	}
+	fmt.Fprintln(w, "Successfully deleted!")
+
 }
 
 func (g *Galleries) galleryByID(w http.ResponseWriter, r *http.Request) (*models.Gallery, error) {
