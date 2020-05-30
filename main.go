@@ -42,7 +42,7 @@ func main() {
 
 	r := mux.NewRouter()
 	usersC := controllers.NewUsers(services.User)
-	galleriesC := controllers.NewGalleries(services.Gallery, r)
+	galleriesC := controllers.NewGalleries(services.Gallery, services.Image, r)
 	staticC := controllers.NewStatic()
 
 	userMw := middleware.User{
