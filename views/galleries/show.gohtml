@@ -1,16 +1,27 @@
 {{define "yield"}}
-	<div class="row">
-		<div class="col-md-12"> 
-        <h1>
-			    {{.Title}} 
-        </h1>
-        <ul>
-          {{range .Images}}
-            <li>
-              <img src="{{.}}">
-            </li>
-          {{end}}
-        </ul>
-		</div>
-	</div>
+<div class="row">
+	<div class="col-md-12"> 
+      <h1>
+		    {{.Title}} 
+      </h1>
+      <hr>
+  </div>
+</div>
+<p		
+<div class="row">
+  {{range .ImagesSplitN 6}}
+    <div class="col-md-4">
+      {{range .}}
+        <a href="{{.}}">
+          <img src="{{.}}" class="thumbnail">
+        </a>
+      {{end}}
+    </div>
+  {{end}}
+</div>
+<style>
+  .thumbnail {
+    width: 100%;
+  }
+</style>
 {{end}}
