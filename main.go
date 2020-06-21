@@ -29,11 +29,9 @@ func must(err error) {
 }
 
 func main() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"dbname=%s sslmode=disable",
-		host, port, user, dbname)
-
-	services, err := models.NewServices(psqlInfo)
+	cfg := DefaultConfig()
+	dbCfg := DefaultPostresConfig()
+	services, err := models.NewServices(dbCfg.Dialect(), dbCfg.ConnectionInfo())
 	if err != nil {
 		panic(err)
 	}
@@ -82,5 +80,5 @@ func main() {
 	var h http.Handler = http.HandlerFunc(notFound)
 	r.NotFoundHandler = h
 	// Applying userMw to all routes
-	http.ListenAndServe(":3000", userMw.Apply(r))
+	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), userMw.Apply(r))
 }
