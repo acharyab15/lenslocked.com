@@ -187,6 +187,19 @@ func (g *Galleries) Delete(w http.ResponseWriter, r *http.Request) {
 
 // GET /galleries
 func (g *Galleries) Index(w http.ResponseWriter, r *http.Request) {
+	// user := context.User(r.Context())
+	galleries, err := g.gs.All()
+	if err != nil {
+		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+		return
+	}
+	var vd views.Data
+	vd.Yield = galleries
+	g.IndexView.Render(w, r, vd)
+}
+
+// GET /galleries
+func (g *Galleries) IndexByUserID(w http.ResponseWriter, r *http.Request) {
 	user := context.User(r.Context())
 	galleries, err := g.gs.ByUserID(user.ID)
 	if err != nil {
